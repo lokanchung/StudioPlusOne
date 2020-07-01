@@ -2,9 +2,13 @@
 #SingleInstance Force
 
 Init:
+    Menu Tray, NoStandard
     Menu Tray, Add, Settings
+    Menu Tray, Add, Run on startup, RunOnStartup
+    Menu Tray, Standard
     RegRead, sensX, HKEY_CURRENT_USER\Software\Studio Plus One, sensX
     RegRead, sensY, HKEY_CURRENT_USER\Software\Studio Plus One, sensY
+    RegRead, runOnStartup, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, Studio Plus One
 
     If (sensX = "") {
         sensX := 4
@@ -12,6 +16,26 @@ Init:
     
     If (sensY = "") {
         sensY := 4
+    }
+
+    If (runOnStartup = "") {
+        runOnStartup := false
+    } Else {
+        runOnStartup := true
+        Menu Tray, Check, Run on startup
+        RegWrite, REG_SZ, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, Studio Plus One, %A_ScriptFullPath%
+    }
+return
+
+RunOnStartup:
+    If (runOnStartup) {
+        Menu %A_ThisMenu%, UnCheck, %A_ThisMenuItem%
+        runOnStartup := false
+        RegDelete, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, Studio Plus One
+    } Else {
+        Menu %A_ThisMenu%, Check, %A_ThisMenuItem%
+        runOnStartup := true
+        RegWrite, REG_SZ, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, Studio Plus One, %A_ScriptFullPath%
     }
 return
 
