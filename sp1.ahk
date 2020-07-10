@@ -71,6 +71,27 @@ MButton Up::
     SetTimer Timer, Off
 return
 
+;; finish this feature
+^WheelDown::
+    MouseGetPos x, y
+    PostMessage, 0x20A, 32 << 16 | 0x4 | 0x8, y << 16 | x ,, A
+return
+
+^WheelUp::
+    MouseGetPos x, y
+    PostMessage, 0x20A, -32 << 16 | 0x4 | 0x8, y << 16 | x ,, A
+return
+
+^+WheelDown::
+    MouseGetPos x, y
+    PostMessage, 0x20A, 32 << 16 | 0x8, y << 16 | x ,, A
+return
+
+^+WheelUp::
+    MouseGetPos x, y
+    PostMessage, 0x20A, -32 << 16 | 0x8, y << 16 | x ,, A
+return
+
 PostMW(delta, sft, x, y)
 { ;http://msdn.microsoft.com/en-us/library/windows/desktop/ms645617(v=vs.85).aspx
   CoordMode, Mouse, Screen
