@@ -1,6 +1,14 @@
 #Persistent
 #SingleInstance Force
 
+SetTitleMatchMode RegEx
+
+; Constants
+kShift := 0x4
+kControl := 0x8
+kNone := 0x0
+
+; Setup Menu
 Init:
     Menu Tray, NoStandard
     Menu Tray, Add, Settings
@@ -10,10 +18,11 @@ Init:
     RegRead, sensY, HKEY_CURRENT_USER\Software\Studio Plus One, sensY
     RegRead, runOnStartup, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, Studio Plus One
 
+    ; Default Values
     If (sensX = "") {
         sensX := 4
     }
-    
+
     If (sensY = "") {
         sensY := 4
     }
@@ -60,11 +69,10 @@ ButtonOK:
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, sensY, %sensY%
 return
 
-#IfWinActive ahk_exe Studio One.exe
+#IfWinActive (.{3`,}) ahk_exe Studio One\.exe
 MButton::
-    ; hWnd is used to detect unfocused editor window.
     MouseGetPos lastX, lastY
-    MouseGetPos startX, startY, hWnd, hControl
+    MouseGetPos startX, startY, dragWnd
     SetTimer Timer, 10
 return
 
@@ -74,31 +82,29 @@ return
 
 ;; finish this feature
 ^WheelDown::
-    MouseGetPos x, y
-    PostMessage, 0x20A, 32 << 16 | 0x4 | 0x8, y << 16 | x ,, A
+    MouseGetPos x, y, wheelWnd
+    PostMW(wheelWnd, -32, kShift | kControl, x, y)
 return
 
 ^WheelUp::
-    MouseGetPos x, y
-    PostMessage, 0x20A, -32 << 16 | 0x4 | 0x8, y << 16 | x ,, A
+    MouseGetPos x, y, wheelWnd
+    PostMW(wheelWnd, 32, kShift | kControl, x, y)
 return
 
 ^+WheelDown::
-    MouseGetPos x, y
-    PostMessage, 0x20A, 32 << 16 | 0x8, y << 16 | x ,, A
+    MouseGetPos x, y, wheelWnd
+    PostMW(wheelWnd, -32, kControl, x, y)
 return
 
 ^+WheelUp::
-    MouseGetPos x, y
-    PostMessage, 0x20A, -32 << 16 | 0x8, y << 16 | x ,, A
+    MouseGetPos x, y, wheelWnd
+    PostMW(wheelWnd, 32, kControl, x, y)
 return
 
-PostMW(hWnd, delta, sft, x, y)
+PostMW(hWnd, delta, modifiers, x, y)
 {
-    
     CoordMode, Mouse, Screen
-    Modifiers := 0x4*sft 
-    PostMessage, 0x20A, delta << 16 | Modifiers, y << 16 | x ,, ahk_id %hWnd%
+    PostMessage, 0x20A, delta << 16 | modifiers, y << 16 | x ,, ahk_id %hWnd%
 }
 
 Timer:
@@ -108,11 +114,12 @@ Timer:
     scrollX := dX * sensX
     scrollY := dY * sensY
 
+    
     If (dX != 0) {
-        PostMW(hWnd, scrollX, true, startX, startY)
+        PostMW(dragWnd, scrollX, kShift, startX, startY)
     }
     If (dY != 0) {
-        PostMW(hWnd, scrollY, false, startX, startY)
+        PostMW(dragWnd, scrollY, kNone, startX, startY)
     }
 
     lastX := curX
