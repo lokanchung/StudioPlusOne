@@ -60,10 +60,11 @@ ButtonOK:
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, sensY, %sensY%
 return
 
-#IfWinActive Studio One
+#IfWinActive ahk_exe Studio One.exe
 MButton::
+    ; hWnd is used to detect unfocused editor window.
     MouseGetPos lastX, lastY
-    MouseGetPos startX, startY
+    MouseGetPos startX, startY, hWnd, hControl
     SetTimer Timer, 10
 return
 
@@ -92,11 +93,12 @@ return
     PostMessage, 0x20A, -32 << 16 | 0x8, y << 16 | x ,, A
 return
 
-PostMW(delta, sft, x, y)
-{ ;http://msdn.microsoft.com/en-us/library/windows/desktop/ms645617(v=vs.85).aspx
-  CoordMode, Mouse, Screen
-  Modifiers := 0x4*sft
-  PostMessage, 0x20A, delta << 16 | Modifiers, y << 16 | x ,, A
+PostMW(hWnd, delta, sft, x, y)
+{
+    
+    CoordMode, Mouse, Screen
+    Modifiers := 0x4*sft 
+    PostMessage, 0x20A, delta << 16 | Modifiers, y << 16 | x ,, ahk_id %hWnd%
 }
 
 Timer:
@@ -107,10 +109,10 @@ Timer:
     scrollY := dY * sensY
 
     If (dX != 0) {
-        PostMW(scrollX, true, startX, startY)
+        PostMW(hWnd, scrollX, true, startX, startY)
     }
     If (dY != 0) {
-        PostMW(scrollY, false, startX, startY)
+        PostMW(hWnd, scrollY, false, startX, startY)
     }
 
     lastX := curX
