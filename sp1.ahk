@@ -102,6 +102,7 @@ MButton Up::
     SetTimer Timer, Off
 return
 
+#If CheckWin() and swapZoom
 ^WheelDown::
     MouseGetPos x, y, wheelWnd
     PostMW(wheelWnd, -32, kShift | kControl, x, y)
