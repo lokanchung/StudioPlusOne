@@ -9,7 +9,7 @@ kShift := 0x4
 kControl := 0x8
 kNone := 0x0
 
-; Setup Menu
+; Setups
 Init:
     Menu Tray, NoStandard
     Menu Tray, Add, Settings
@@ -20,7 +20,7 @@ Init:
     RegRead, runOnStartup, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, Studio Plus One
     RegRead, swapZoom, HKEY_CURRENT_USER\Software\Studio Plus One, swapZoom
     RegRead, auditionNotes, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotes
-
+    RegRead, auditionNotesShortcut, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotesShortcut
 
     ; Default Values
     If (sensX = "") {
@@ -46,6 +46,10 @@ Init:
     If (auditionNotes = "") {
         auditionNotes := false
     }
+
+    If (auditionNotesShortcut = "") {
+        auditionNotesShortcut := "XButton2"
+    }
 return
 
 RunOnStartup:
@@ -60,6 +64,11 @@ RunOnStartup:
     }
 return
 
+UpdateDynamicHotKeys:
+    Hotkey, %auditionNotesShortcut%, AuditionNotesHotKey
+return
+
+; Settings Menu
 Settings:
     Gui New, -Resize, Settings
     Gui Show, W400 H200
@@ -71,8 +80,10 @@ Settings:
     Gui, Add, UpDown, vGuiSensY Range1-50, %sensY%
     Gui, Add, Checkbox, vGuiSwapZoom, Swap Ctrl+Wheel, Ctrl+Shift+Wheel
     GuiControl,,GuiSwapZoom, %swapZoom%
-    Gui, Add, Checkbox, vGuiAuditionNotes, Audition Multiple Notes Shortcut (XButton2)
+    Gui, Add, Checkbox, vGuiAuditionNotes, Audition Multiple Notes
     GuiControl,,GuiAuditionNotes, %auditionNotes%
+    GUI, Add, Edit, vGuiAuditionNotesShortcut, Audition Notes Shortcut
+    GuiControl,,GuiAuditionNotesShortcut, %auditionNotesShortcut%
     Gui, Add, Button, Default, OK
 return
 
@@ -81,13 +92,16 @@ ButtonOK:
     GuiControlGet, sensY,, GuiSensY
     GuiControlGet, swapZoom,, GuiSwapZoom
     GuiControlGet, auditionNotes,, GuiAuditionNotes
+    GuiControlGet, auditionNotesShortcut,, GuiAuditionNotesShortcut
     Gui Hide
 
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, sensX, %sensX%
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, sensY, %sensY%
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, swapZoom, %swapZoom%
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotes, %auditionNotes%
+    RegWrite, REG_SZ, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotesShortcut, %auditionNotesShortcut%
 
+    GOSUB UpdateDynamicHotKeys
 return
 
 CheckWin() {
@@ -133,16 +147,14 @@ return
     PostMW(wheelWnd, 32, kControl, x, y)
 return
 
-#If CheckWin() and swapZoom and auditionNotes
-; Auditioning multiple notes (change XButton2 to whichever shortcut you want)
-XButton2::
+#If CheckWin() and auditionNotes
+AuditionNotesHotkey:
     SendInput {6}
     Click, Down
-    keyWait, XButton2
+    KeyWait, %auditionNotesShortcut%
     Click, Up
     SendInput {1}
 return
-#If
 
 PostMW(hWnd, delta, modifiers, x, y)
 {
