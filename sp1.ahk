@@ -111,7 +111,6 @@ ButtonOK:
     GuiControlGet, quickErase,, GuiQuickErase
     GuiControlGet, quickEraseShortcut,, GuiQuickEraseShortcut
 
-
     Gui Hide
 
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, sensX, %sensX%
@@ -177,7 +176,6 @@ AuditionNotesHotkey:
     SendInput {1}
 return
 
-; GabPou's code for quick erase
 #If CheckWin() and quickErase
 QuickEraseHotkey:
     SendInput {4}
