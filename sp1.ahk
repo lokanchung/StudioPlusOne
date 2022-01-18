@@ -182,10 +182,8 @@ return
 QuickEraseHotkey:
     SendInput {4}
     Click, Down
-    Loop
-    {
-        if GetKeyState("LButton", "P") 
-        {
+    Loop {
+        if GetKeyState("LButton", "P") {
             Click, Up
             SendInput {1}
             Click, Down
@@ -199,8 +197,7 @@ QuickEraseHotkey:
     SendInput {1}
 return
 
-PostMW(hWnd, delta, modifiers, x, y)
-{
+PostMW(hWnd, delta, modifiers, x, y) {
     CoordMode, Mouse, Screen
     PostMessage, 0x20A, delta << 16 | modifiers, y << 16 | x ,, A
 }
@@ -215,6 +212,7 @@ Timer:
     If (dX != 0) {
         PostMW(dragWnd, scrollX, kShift, startX, startY)
     }
+    
     If (dY != 0) {
         PostMW(dragWnd, scrollY, kNone, startX, startY)
     }
