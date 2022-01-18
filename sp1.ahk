@@ -93,11 +93,11 @@ Settings:
     GuiControl,,GuiSwapZoom, %swapZoom%
     Gui, Add, Checkbox, vGuiAuditionNotes, Audition Multiple Notes
     GuiControl,,GuiAuditionNotes, %auditionNotes%
-    GUI, Add, Edit, vGuiAuditionNotesShortcut, Audition Notes Shortcut
+    GUI, Add, Edit, vGuiAuditionNotesShortcut, Audition Multiple Notes Shortcut
     GuiControl,,GuiAuditionNotesShortcut, %auditionNotesShortcut%
-    Gui, Add, Checkbox, vGuiQuickErase, Erase Multiple Notes
+    Gui, Add, Checkbox, vGuiQuickErase, Quick Erase Multiple Notes
     GuiControl,,GuiQuickErase, %quickErase%
-    GUI, Add, Edit, vGuiQuickEraseShortcut, Erase Notes Shortcut
+    GUI, Add, Edit, vGuiQuickEraseShortcut, Quick Erase Multiple Notes Shortcut
     GuiControl,,GuiQuickEraseShortcut, %QuickEraseShortcut%
     Gui, Add, Button, Default, OK
 return
