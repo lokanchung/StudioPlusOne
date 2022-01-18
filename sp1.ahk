@@ -60,6 +60,8 @@ Init:
     If (quickEraseShortcut = "") {
         quickEraseShortcut := "XButton1"
     }
+
+    GOSUB UpdateDynamicHotKeys
 return
 
 RunOnStartup:
