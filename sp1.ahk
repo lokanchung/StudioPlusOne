@@ -21,6 +21,8 @@ Init:
     RegRead, swapZoom, HKEY_CURRENT_USER\Software\Studio Plus One, swapZoom
     RegRead, auditionNotes, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotes
     RegRead, auditionNotesShortcut, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotesShortcut
+    RegRead, quickErase, HKEY_CURRENT_USER\Software\Studio Plus One, quickErase
+    RegRead, quickEraseShortcut, HKEY_CURRENT_USER\Software\Studio Plus One, quickEraseShortcut
 
     ; Default Values
     If (sensX = "") {
@@ -50,6 +52,14 @@ Init:
     If (auditionNotesShortcut = "") {
         auditionNotesShortcut := "XButton2"
     }
+
+    If (quickErase = "") {
+        quickErase := false
+    }
+
+    If (quickEraseShortcut = "") {
+        quickEraseShortcut := "XButton1"
+    }
 return
 
 RunOnStartup:
@@ -66,12 +76,13 @@ return
 
 UpdateDynamicHotKeys:
     Hotkey, %auditionNotesShortcut%, AuditionNotesHotKey
+    Hotkey, %quickEraseShortcut%, quickEraseHotKey
 return
 
 ; Settings Menu
 Settings:
     Gui New, -Resize, Settings
-    Gui Show, W400 H200
+    Gui Show, W400 H250
     Gui, Add, Text,, Sensitivity X:
     Gui, Add, Edit, vGuiSensXEdit
     Gui, Add, UpDown, vGuiSensX Range1-50, %sensX%
@@ -84,6 +95,10 @@ Settings:
     GuiControl,,GuiAuditionNotes, %auditionNotes%
     GUI, Add, Edit, vGuiAuditionNotesShortcut, Audition Notes Shortcut
     GuiControl,,GuiAuditionNotesShortcut, %auditionNotesShortcut%
+    Gui, Add, Checkbox, vGuiQuickErase, Erase Multiple Notes
+    GuiControl,,GuiQuickErase, %quickErase%
+    GUI, Add, Edit, vGuiQuickEraseShortcut, Erase Notes Shortcut
+    GuiControl,,GuiQuickEraseShortcut, %QuickEraseShortcut%
     Gui, Add, Button, Default, OK
 return
 
@@ -93,6 +108,9 @@ ButtonOK:
     GuiControlGet, swapZoom,, GuiSwapZoom
     GuiControlGet, auditionNotes,, GuiAuditionNotes
     GuiControlGet, auditionNotesShortcut,, GuiAuditionNotesShortcut
+    GuiControlGet, quickErase,, GuiQuickErase
+    GuiControlGet, quickEraseShortcut,, GuiQuickEraseShortcut
+
     Gui Hide
 
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, sensX, %sensX%
@@ -100,6 +118,8 @@ ButtonOK:
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, swapZoom, %swapZoom%
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotes, %auditionNotes%
     RegWrite, REG_SZ, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotesShortcut, %auditionNotesShortcut%
+    RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, quickErase, %quickErase%
+    RegWrite, REG_SZ, HKEY_CURRENT_USER\Software\Studio Plus One, quickEraseShortcut, %quickEraseShortcut%
 
     GOSUB UpdateDynamicHotKeys
 return
@@ -152,6 +172,27 @@ AuditionNotesHotkey:
     SendInput {6}
     Click, Down
     KeyWait, %auditionNotesShortcut%
+    Click, Up
+    SendInput {1}
+return
+
+#If CheckWin() and quickErase
+QuickEraseHotkey:
+    SendInput {4}
+    Click, Down
+    Loop
+    {
+        if GetKeyState("LButton", "P") 
+        {
+            Click, Up
+            SendInput {1}
+            Click, Down
+            KeyWait, LButton
+            Click, Up
+            SendInput {delete}
+        }
+    }
+    Until (not GetKeyState(quickEraseShortcut, "P"))
     Click, Up
     SendInput {1}
 return
