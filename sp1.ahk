@@ -199,7 +199,10 @@ return
 
 PostMW(hWnd, delta, modifiers, x, y) {
     CoordMode, Mouse, Screen
-    PostMessage, 0x20A, delta << 16 | modifiers, y << 16 | x ,, A
+    LOX := x & 0xFFFF
+    HOY := y & 0xFFFF
+
+    PostMessage, 0x20A, delta << 16 | modifiers, HOY << 16 | LOX ,, A
 }
 
 Timer:
