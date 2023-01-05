@@ -18,6 +18,7 @@ Init:
     RegRead, sensX, HKEY_CURRENT_USER\Software\Studio Plus One, sensX
     RegRead, sensY, HKEY_CURRENT_USER\Software\Studio Plus One, sensY
     RegRead, runOnStartup, HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run, Studio Plus One
+    RegRead, mmbPanning, HKEY_CURRENT_USER\Software\Studio Plus One, mmbPanning
     RegRead, swapZoom, HKEY_CURRENT_USER\Software\Studio Plus One, swapZoom
     RegRead, auditionNotes, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotes
     RegRead, auditionNotesShortcut, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotesShortcut
@@ -31,6 +32,11 @@ Init:
 
     If (sensY = "") {
         sensY := 4
+    }
+
+    If (mmbPanning = "") {
+        ; To match with existing behaviour, this is defaults to true
+        mmbPanning := true
     }
 
     If (runOnStartup = "") {
@@ -91,6 +97,8 @@ Settings:
     Gui, Add, Text,, Sensitivity Y:
     Gui, Add, Edit, vGuiSensYEdit
     Gui, Add, UpDown, vGuiSensY Range1-50, %sensY%
+    Gui, Add, Checkbox, vGuiMmbPanning, Middle Mouse Button Panning
+    GuiControl,,GuiMmbPanning, %mmbPanning%
     Gui, Add, Checkbox, vGuiSwapZoom, Swap Ctrl+Wheel, Ctrl+Shift+Wheel
     GuiControl,,GuiSwapZoom, %swapZoom%
     Gui, Add, Checkbox, vGuiAuditionNotes, Audition Multiple Notes
@@ -107,6 +115,7 @@ return
 ButtonOK:
     GuiControlGet, sensX,, GuiSensX
     GuiControlGet, sensY,, GuiSensY
+    GuiControlGet, mmbPanning,, GuiMmbPanning
     GuiControlGet, swapZoom,, GuiSwapZoom
     GuiControlGet, auditionNotes,, GuiAuditionNotes
     GuiControlGet, auditionNotesShortcut,, GuiAuditionNotesShortcut
@@ -117,6 +126,7 @@ ButtonOK:
 
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, sensX, %sensX%
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, sensY, %sensY%
+    RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, mmbPanning, %mmbPanning%
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, swapZoom, %swapZoom%
     RegWrite, REG_DWORD, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotes, %auditionNotes%
     RegWrite, REG_SZ, HKEY_CURRENT_USER\Software\Studio Plus One, auditionNotesShortcut, %auditionNotesShortcut%
@@ -137,7 +147,7 @@ CheckWin() {
     return false
 }
 
-#If CheckWin()
+#If CheckWin() and mmbPanning
 MButton::
     MouseGetPos lastX, lastY
     MouseGetPos startX, startY, dragWnd
@@ -146,6 +156,9 @@ return
 
 MButton Up::
     SetTimer Timer, Off
+    If (not mmbPanning) {
+        Send {MButton Up}
+    }
 return
 
 #If CheckWin() and swapZoom
