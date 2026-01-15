@@ -144,6 +144,9 @@ CheckWin() {
     If (exe = "studio one.exe") {
         return true
     }
+    Else If (exe = "studio pro.exe") {
+        return true
+    }
     return false
 }
 
