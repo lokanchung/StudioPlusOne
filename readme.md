@@ -1,3 +1,5 @@
+# Currently Fender Studio Pro 8 is not supported (I'm working on the issue)
+----
 # Studio Plus One
 An add-on based on AutoHotKey. Includes following features.
 * MMB drag to pan around. Disables default middle mouse click behaviour (shift + mmb still works)
